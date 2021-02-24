@@ -1,52 +1,47 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import SeasonDisplay from './SeasonDisplay';
+import Spinner from './Spinner';
 class App extends React.Component{
-    //A function that is special to the JS language
-    constructor(props){
-        super(props);
 
-        //number default is null
-        //this is the only time we do direct assignment 
-        //to this.state
-        //everytime we want to change or manipulate a property, use setState
-        this.state = { lat: null, errorMessage: '' };
-
-        window.navigator.geolocation.getCurrentPosition(
-            position => {
-                //we called setState
-                //coords and latitude was found inside the development in chrome
-                this.setState({ lat: position.coords.latitude });
-
-                //we did not write:
-                //this.state.lat = position.coords.latitude
-            },
-            err => {
-                this.setState({ errorMessage: err.message });
-            }
-        );
-    }
+    state = { lat: null, errorMessage: '' };
 
     componentDidMount(){
-        console.log('My component was rendered to the screen');
+        window.navigator.geolocation.getCurrentPosition(
+            position => this.setState({ lat: position.coords.latitude }),
+            err => this.setState({ errorMessage: err.message })
+        );
     }
-
-    componentDidUpdate(){
-        console.log('My component was just updated - it rerendered');
-    }
-
-    //React says we have to define render
-    render() {
+    
+    renderContent(){
         if (this.state.errorMessage && !this.state.lat){
             return <div> Error: {this.state.errorMessage} </div>
         }
 
         if (!this.state.errorMessage && this.state.lat) {
-            return <div>Latitude: {this.state.lat} </div>
+            return <SeasonDisplay lat={this.state.lat} />
         }
 
         //catchall!
-        return <div>Loading!</div>;
+        return <Spinner message="Please accept request"/>;
+    }
+
+    render() {
+        return(
+            <div className="border red">
+                {this.renderContent()}
+            </div>
+        );
     }
 }
 
 ReactDOM.render(<App />, document.querySelector('#root'))
+
+const UserForm = () => {
+    return (
+        <form>
+            <label>Enter a username:</label>
+            <input />
+        </form>
+    );
+}
